@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  GitHubBrowser
+
+  Created by Murilo Clemente on 14/10/2020.
+  
+*/
+"userSearch.placeholder" = "Search for a GitHub user...";
+"userSearch.title" = "User Search";

@@ -1,0 +1,64 @@
+name: GitHubBrowser
+options:
+    bundleIdPrefix: com.muclemente.GitHubBrowser
+    deploymentTarget:
+        iOS: 12.0
+settings:
+    SWIFT_VERSION: 5.3
+targets:
+    App:
+        type: application
+        platform: iOS
+        sources: [App]
+        settings:
+            TARGET_NAME: "GitHubBrowser"
+        dependencies:
+            - target: Core
+            - target: Features
+            - target: Provider
+        postCompileScripts:
+            - script: ${PODS_ROOT}/SwiftLint/swiftlint
+              name: Swiftlint
+    Core:
+        type: framework
+        platform: iOS
+        sources: [Core]
+    Provider:
+        type: framework
+        platform: iOS
+        sources: [Provider]
+        dependencies:
+            - target: Core
+    Features:
+        type: framework
+        platform: iOS
+        sources: [Features]
+        dependencies:
+            - target: Core
+    UnitTests:
+        type: bundle.unit-test
+        platform: iOS
+        sources: [UnitTests]
+        dependencies:
+            - target: App
+        settings:
+            TEST_HOST: "$(BUILT_PRODUCTS_DIR)/GitHubBrowser.app/GitHubBrowser"
+schemes:
+    GitHubBrowser Debug:
+        build:
+            targets:
+                App: all
+                Core: all
+                Features: all
+                Provider: all
+                UnitTests: [test]
+        run:
+            config: Debug
+        test:
+            config: Debug
+            targets:
+                - name: UnitTests
+            gatherCoverageData: true
+
+        
+    
