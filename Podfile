@@ -10,10 +10,6 @@ end
 
 target 'App' do
   commonPods
-
-  target 'UnitTests' do
-    inherit! :search_paths
-  end
 end
 
 target 'Core' do
@@ -27,4 +23,9 @@ end
 target 'Features' do
   commonPods
   pod 'RxDataSources', '~> 4.0'
+end
+
+target 'UnitTests' do
+  commonPods
+  pod 'RxTest'
 end

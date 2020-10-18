@@ -7,3 +7,15 @@
 */
 "userSearch.placeholder" = "Search for a GitHub user...";
 "userSearch.title" = "User Search";
+"userSearch.noData" = "No users found.";
+"userRepo.title" = "%@'s repos";
+"userRepo.noData" = "User doesn't have any public repositories.";
+"common.back" = "Back";
+"userProfile.title" = "%@'s profile";
+"userProfile.company" = "Company: %@";
+"userProfile.location" = "Location: %@";
+"userProfile.email" = "Email: %@";
+"userProfile.publicRepos" = "Repositories: %d";
+"userProfile.publicGists" = "Gists: %d";
+"userProfile.followers" = "Followers: %d";
+"userProfile.following" = "Following: %d";

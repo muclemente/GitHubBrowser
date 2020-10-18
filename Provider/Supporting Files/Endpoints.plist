@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UserRepositories</key>
+	<string>https://api.github.com/users/%@/repos</string>
+	<key>UserProfile</key>
+	<string>https://api.github.com/users/%@</string>
 	<key>SearchUsers</key>
 	<string>https://api.github.com/search/users?q=%@&amp;per_page=%d</string>
 </dict>

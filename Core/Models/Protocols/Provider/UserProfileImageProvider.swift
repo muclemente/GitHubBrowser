@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 
+/// @mockable
 public protocol UserProfileImageProvider {
     func fetch(url: URL) -> Observable<UIImage>
 }

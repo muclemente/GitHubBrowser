@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 
+/// @mockable
 public protocol FileProvider {
     func fetch(fileName: String) throws -> UIImage
     func save(fileName: String, data: Data) throws

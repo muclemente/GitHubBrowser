@@ -16,12 +16,10 @@ class UserListCell: UITableViewCell, ReusableView {
         setupCell()
         addSubviews()
         addConstraints()
-        bind()
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        backgroundColor = .white
         disposeBag = DisposeBag()
         viewModel = UserListCellViewModel()
     }
@@ -39,7 +37,7 @@ class UserListCell: UITableViewCell, ReusableView {
 
     private lazy var usernameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = .preferredFont(forTextStyle: .body)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -54,33 +52,45 @@ class UserListCell: UITableViewCell, ReusableView {
 
     private func addConstraints() {
         let margin = UIConstants.defaultMargin
+        let height = userProfileImageView.heightAnchor.constraint(equalToConstant: UIConstants.pictureSize)
+        height.priority = .defaultHigh
         activateConstraints([
             userProfileImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: margin),
             userProfileImageView.leadingAnchor.constraint(equalTo: contentView.readableContentGuide.leadingAnchor),
-            userProfileImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -margin)
+            userProfileImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -margin),
+            userProfileImageView.widthAnchor.constraint(equalToConstant: UIConstants.pictureSize),
+            height
         ])
-
-        userProfileImageView.constrainSize(to: UIConstants.pictureSize)
-
         activateConstraints([
-            usernameLabel.topAnchor.constraint(equalTo: userProfileImageView.topAnchor),
+            usernameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             usernameLabel.leadingAnchor.constraint(equalTo: userProfileImageView.trailingAnchor, constant: UIConstants.defaultSpacing)
         ])
     }
 
-    private func bind() {
-        viewModel.username.bind(to: usernameLabel.rx.text).disposed(by: disposeBag)
-        viewModel.profileImage.bind(to: userProfileImageView.rx.image).disposed(by: disposeBag)
+    private func bind(user: User) {
+        viewModel.username
+            .drive(usernameLabel.rx.text)
+            .disposed(by: disposeBag)
+        viewModel.loading
+            .drive(userProfileImageView.spinner.rx.isAnimating)
+            .disposed(by: disposeBag)
+        viewModel.loading
+            .inverted()
+            .drive(userProfileImageView.loadingMask.rx.isHidden)
+            .disposed(by: disposeBag)
+        viewModel.updateUser(user)
+            .drive(userProfileImageView.rx.image)
+            .disposed(by: disposeBag)
     }
 
     private func setupCell() {
+        accessoryType = .disclosureIndicator
         selectionStyle = .none
     }
 
     // MARK: Public methods
     func update(_ user: User) {
-        bind()
-        viewModel.updateUser(user).observeOn(MainScheduler.instance).subscribe(viewModel.handleProfileImageEvent).disposed(by: disposeBag)
+        bind(user: user)
     }
 }
 

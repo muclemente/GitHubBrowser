@@ -11,7 +11,7 @@ import RxDataSources
 import RxSwift
 import UIKit
 
-final class UserSearchViewController: UserListViewController {
+final class UserSearchViewController: ListViewController {
     // MARK: Private properties
     private let viewModel: UserSearchViewModel
     private let disposeBag = DisposeBag()
@@ -26,41 +26,64 @@ final class UserSearchViewController: UserListViewController {
         return searchController
     }()
 
+    let dataSource = RxTableViewSectionedReloadDataSource<UserListSection> { _, tableView, indexPath, user -> UITableViewCell in
+        let cell = UserListCell.dequeueCell(from: tableView, at: indexPath)
+        cell.update(user)
+        return cell
+    }
+
     init(viewModel: UserSearchViewModel) {
         self.viewModel = viewModel
-        super.init(viewModel: viewModel)
+        super.init()
     }
 
     // MARK: Internal methods
     override func viewDidLoad() {
         super.viewDidLoad()
         setupController()
-        addSubviews()
-        addConstraints()
-        setupObservers()
-        title = "userSearch.title".localized
+        bind()
     }
 
     private func setupController() {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.searchController = searchController
+        UserListCell.register(for: tableView)
+        title = "userSearch.title".localized
+        noDataLabel.text = "userSearch.noData".localized
     }
 
-    private func addSubviews() {
-    }
-
-    private func addConstraints() {
-    }
-
-    private func setupObservers() {
-        let searchUserObservable =
-            searchController.searchBar.rx
+    private func bind() {
+        // Debounce makes sure that there's a minimum time for the user to type before sending the request
+        // FlatMapLatest disposes any pending requests in case the debounce timer was fired but another request was made after it
+        searchController.searchBar.rx
             .text
             .debounce(AppConstants.inputDebounceTimer, scheduler: MainScheduler.instance)
-            .flatMap(viewModel.handleSearchControllerTextChange(text:))
+            .filter { $0 != self.viewModel.searchTerm && $0 != nil }
+            .flatMapLatest(viewModel.handleSearchControllerTextChange(text:))
+            .observeOn(MainScheduler())
+            .bind(to: tableView.rx.items(dataSource: self.dataSource))
+            .disposed(by: disposeBag)
 
-        searchUserObservable
-            .observeOn(MainScheduler.instance).subscribe(viewModel.handleFetchUserEvent)
+        viewModel.dataEmpty
+            .inverted()
+            .drive(noDataLabel.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        viewModel
+            .loading
+            .drive(spinner.rx.isAnimating)
+            .disposed(by: disposeBag)
+
+        viewModel
+            .loading
+            .inverted()
+            .drive(loadingMask.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        tableView.rx
+            .itemSelected
+            .map { self.dataSource[$0] }
+            .subscribe { self.viewModel.didSelect(user: $0) }
             .disposed(by: disposeBag)
     }
 }

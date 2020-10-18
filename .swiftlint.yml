@@ -88,7 +88,6 @@ opt_in_rules:
   - raw_value_for_camel_cased_codable_enum
   - reduce_into
   - single_test_class
-  - trailing_closure
   - unowned_variable_capture
   - unused_declaration
   - vertical_parameter_alignment_on_call

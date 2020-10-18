@@ -30,5 +30,13 @@ class DependencyInjector {
         DependencyManager.register(FileProvider.self) {
             IOSFileProvider()
         }
+
+        DependencyManager.register(UserRepositoriesProvider.self) {
+            GitHubUserRepositoriesProvider()
+        }
+
+        DependencyManager.register(UserProfileProvider.self) {
+            GitHubUserProfileProvider()
+        }
     }
 }

@@ -10,56 +10,49 @@ import RxCocoa
 import RxDataSources
 import RxSwift
 
-struct UserSection: SectionModelType {
-    var items: [Item]
-    typealias Item = User
+class UserSearchViewModel {
+    private lazy var provider = DependencyManager.resolve(UsersSearchProvider.self)
+    private var loadingPublish: PublishSubject<Bool> = PublishSubject()
+    private var dataEmptyPublish: PublishSubject<Bool> = PublishSubject()
 
-    init(original: UserSection, items: [Item]) {
-        self = original
-        self.items = items
-    }
-
-    init(users: [User]) {
-        self.items = users
-    }
-}
-
-protocol UserListViewModelable {
-    var loading: PublishSubject<Bool> { get set }
-    var usersSection: PublishSubject<[UserSection]> { get set }
-}
-
-class UserSearchViewModel: UserListViewModelable {
-    private let provider = DependencyManager.resolve(UsersSearchProvider.self)
-
-    var loading: PublishSubject<Bool> = PublishSubject()
-    var usersSection: PublishSubject<[UserSection]> = PublishSubject()
+    var loading: Driver<Bool>
+    var dataEmpty: Driver<Bool>
     var searchTerm: String?
+    weak var navigationDelegate: UserSearchNavigationDelegate?
 
-    func handleSearchControllerTextChange(text: String?) throws -> Observable<[User]> {
+    init() {
+        loading = loadingPublish.asDriver(onErrorJustReturn: false)
+        dataEmpty = dataEmptyPublish.asDriver(onErrorJustReturn: false)
+    }
+
+    func handleSearchControllerTextChange(text: String?) -> Driver<[UserListSection]> {
         searchTerm = text
-        guard let searchTerm = text,
+        return fetchUsers(searchTerm: searchTerm)
+            .do(onNext: validateEmptyData)
+    }
+
+    func didSelect(user: User) {
+        navigationDelegate?.didSelect(user: user)
+    }
+
+    private func validateEmptyData(_ data: [UserListSection]) {
+        self.dataEmptyPublish.onNext(data.first?.items.isEmpty ?? true)
+    }
+
+    private func fetchUsers(searchTerm: String?) -> Driver<[UserListSection]> {
+        guard let searchTerm = searchTerm,
               searchTerm.count > 2 else {
-            return .just([])
+            return .just([UserListSection(users: [])])
         }
-        loading.onNext(true)
-        return provider.fetch(searchTerm: searchTerm)
+        loadingPublish.onNext(true)
+        return self.provider.fetch(searchTerm: searchTerm)
+            .map { self.processUserResults($0) }
+            .do(onDispose: { self.loadingPublish.onNext(false) })
+            .asDriver(onErrorJustReturn: [])
     }
 
-    func handleFetchUserEvent(event: Event<[User]>) {
-        switch event {
-        case .next(let users):
-            self.processUserResults(users: users)
-        case .completed:
-            print("finished")
-        case .error(let error):
-            self.usersSection.onError(error)
-        }
-        loading.onNext(false)
-    }
-
-    private func processUserResults(users: [User]) {
-        let section = UserSection(users: users)
-        self.usersSection.onNext([section])
+    private func processUserResults(_ users: [User]) -> [UserListSection] {
+        let section = UserListSection(users: users)
+        return [section]
     }
 }

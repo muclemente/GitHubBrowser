@@ -8,14 +8,12 @@
 import Foundation
 import UIKit
 
-public final class AppCoordinator {
-
+public final class AppCoordinator: Coordinator {
     // MARK: Private variables
     private let window: UIWindow
     private let navigationController: UINavigationController
-    private var userSearchCoordinator: UserSearchCoordinator {
-        UserSearchCoordinator(navigationController: navigationController)
-    }
+    var childCoordinators: [Coordinator] = []
+    var isCompleted: (() -> Void)?
 
     // MARK: Public
     public init() {
@@ -33,6 +31,8 @@ public final class AppCoordinator {
     // MARK: Private methods
 
     private func presentUserSearchCoordinator() {
-        userSearchCoordinator.start()
+        let controller = UserSearchCoordinator(navigationController: navigationController)
+        store(coordinator: controller)
+        controller.start()
     }
 }

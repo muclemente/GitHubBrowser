@@ -9,4 +9,6 @@ import Foundation
 
 public enum Endpoint: String {
     case searchUsers = "SearchUsers"
+    case userRepositories = "UserRepositories"
+    case userProfile = "UserProfile"
 }

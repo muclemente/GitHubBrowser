@@ -10,6 +10,7 @@ import RxSwift
 
 public typealias RequestResponse = (response: HTTPURLResponse, data: Data)
 
+/// @mockable
 public protocol RequestProvider {
     func fetch(endpoint: Endpoint, args: CVarArg...) -> Observable<RequestResponse>
     func fetch(url: URL) -> Observable<RequestResponse>

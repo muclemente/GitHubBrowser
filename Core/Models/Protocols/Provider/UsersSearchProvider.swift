@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 
+/// @mockable
 public protocol UsersSearchProvider {
     func fetch(searchTerm: String) -> Observable<[User]>
 }

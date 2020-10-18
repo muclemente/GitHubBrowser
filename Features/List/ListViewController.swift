@@ -1,5 +1,5 @@
 //
-//  UserListViewController.swift
+//  ListViewController.swift
 //  Features
 //
 //  Created by Murilo Clemente on 14/10/2020.
@@ -11,14 +11,12 @@ import RxDataSources
 import RxSwift
 import UIKit
 
-class UserListViewController: UIViewController {
+class ListViewController: UIViewController {
     // MARK: Private properties
-    private let viewModel: UserListViewModelable
     private let disposeBag = DisposeBag()
 
     // MARK: public methods
-    init(viewModel: UserListViewModelable) {
-        self.viewModel = viewModel
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -27,21 +25,39 @@ class UserListViewController: UIViewController {
         fatalError("Tried to initialize UserSearchViewController from a xib")
     }
 
-    private lazy var spinner: UIActivityIndicatorView = {
+    internal lazy var spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .gray)
         spinner.hidesWhenStopped = true
         spinner.translatesAutoresizingMaskIntoConstraints = false
         return spinner
     }()
 
-    private lazy var tableView: UITableView = {
+    internal lazy var loadingMask: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .darkGray
+        view.alpha = 0.7
+        view.isHidden = true
+        return view
+    }()
+
+    internal lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.estimatedRowHeight = 40
         tableView.tableFooterView = UIView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.rowHeight = UITableView.automaticDimension
-        UserListCell.register(for: tableView)
         return tableView
+    }()
+
+    internal lazy var noDataLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.isHidden = true
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 16, weight: .semibold)
+        label.textColor = .darkGray
+        return label
     }()
 
     // MARK: Internal methods
@@ -50,7 +66,6 @@ class UserListViewController: UIViewController {
         setupController()
         addSubviews()
         addConstraints()
-        bind()
     }
 
     // MARK: Internal methods
@@ -59,22 +74,15 @@ class UserListViewController: UIViewController {
 
     private func addSubviews() {
         view.addSubview(tableView)
+        view.addSubview(loadingMask)
         view.addSubview(spinner)
+        view.addSubview(noDataLabel)
     }
 
     private func addConstraints() {
         spinner.centerInSuperview()
+        loadingMask.constrainToSuperviewBounds()
         tableView.constrainToSuperviewBounds()
-    }
-
-    let dataSource = RxTableViewSectionedReloadDataSource<UserSection> { _, tableView, indexPath, user -> UITableViewCell in
-        let cell = UserListCell.dequeueCell(from: tableView, at: indexPath)
-        cell.update(user)
-        return cell
-    }
-
-    private func bind() {
-        viewModel.loading.bind(to: spinner.rx.isAnimating).disposed(by: disposeBag)
-        viewModel.usersSection.bind(to: tableView.rx.items(dataSource: self.dataSource)).disposed(by: disposeBag)
+        noDataLabel.centerInSuperview(insettedBy: UIEdgeInsets(horizontal: 0, vertical: -30))
     }
 }
