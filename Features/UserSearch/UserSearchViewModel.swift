@@ -10,6 +10,10 @@ import RxCocoa
 import RxDataSources
 import RxSwift
 
+protocol UserSearchNavigationDelegate: AnyObject {
+    func didSelect(user: User)
+}
+
 class UserSearchViewModel {
     private lazy var provider = DependencyManager.resolve(UsersSearchProvider.self)
     private var loadingPublish: PublishSubject<Bool> = PublishSubject()
@@ -46,8 +50,8 @@ class UserSearchViewModel {
         }
         loadingPublish.onNext(true)
         return self.provider.fetch(searchTerm: searchTerm)
-            .map { self.processUserResults($0) }
-            .do(onDispose: { self.loadingPublish.onNext(false) })
+            .map { [weak self] in self?.processUserResults($0) ?? [] }
+            .do(onDispose: { [weak self] in self?.loadingPublish.onNext(false) })
             .asDriver(onErrorJustReturn: [])
     }
 

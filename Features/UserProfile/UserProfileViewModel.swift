@@ -32,8 +32,8 @@ class UserProfileViewModel {
         self.loadingPublish.onNext(true)
         return provider.fetch(user: user)
             .flatMap(self.validateProfileData)
-            .do(onDispose: {
-                self.loadingPublish.onNext(false)
+            .do(onDispose: { [weak self] in
+                self?.loadingPublish.onNext(false)
             })
     }
 

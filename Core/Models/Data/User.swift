@@ -19,7 +19,7 @@ public struct UserDetails: Codable {
         case followers
         case following
     }
-    public let name: String
+    public let name: String?
     public let company: String?
     public let location: String?
     public let email: String?
@@ -31,7 +31,7 @@ public struct UserDetails: Codable {
 
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.name = try values.decode(String.self, forKey: .name)
+        self.name = try? values.decode(String.self, forKey: .name)
         self.company = try? values.decode(String.self, forKey: .company)
         self.location = try? values.decode(String.self, forKey: .location)
         self.email = try? values.decode(String.self, forKey: .email)

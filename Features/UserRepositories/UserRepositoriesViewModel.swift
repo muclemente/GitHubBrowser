@@ -35,7 +35,7 @@ class UserRepositoriesViewModel {
         loadingPublish.onNext(true)
         return provider.fetch(user: user)
             .do(onNext: validateEmptyData)
-            .do(onDispose: { self.loadingPublish.onNext(false) })
+            .do(onDispose: { [weak self] in self?.loadingPublish.onNext(false) })
             .asDriver(onErrorJustReturn: [])
     }
 

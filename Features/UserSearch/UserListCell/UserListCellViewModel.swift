@@ -10,10 +10,6 @@ import RxCocoa
 import RxDataSources
 import RxSwift
 
-protocol UserSearchNavigationDelegate: AnyObject {
-    func didSelect(user: User)
-}
-
 class UserListCellViewModel {
     private let profileImageProvider = DependencyManager.resolve(UserProfileImageProvider.self)
 
