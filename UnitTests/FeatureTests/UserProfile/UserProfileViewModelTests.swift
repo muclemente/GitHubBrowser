@@ -102,4 +102,18 @@ class UserProfileViewModelTests: XCTestCase {
             }
         }
     }
+
+    func testCoordinatorBack() {
+        let nav = UINavigationController()
+        nav.pushViewController(UIViewController(), animated: false)
+        let coordinator = UserProfileCoordinator(navigationController: nav, user: User(id: 1, login: ""))
+        coordinator.start()
+        wait(timeout: 0.4) // Wait until UIKit adds the VC in the structure
+        XCTAssertEqual(nav.viewControllers.count, 2)
+        XCTAssertTrue(nav.topViewController is UserProfileViewController)
+        let controller = nav.topViewController as? UserProfileViewController
+        controller?.didTapBack()
+        wait(timeout: 0.4)
+        XCTAssertEqual(nav.viewControllers.count, 1)
+    }
 }

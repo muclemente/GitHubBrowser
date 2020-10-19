@@ -52,7 +52,7 @@ class UserRepositoryCell: UITableViewCell, ReusableView {
     private lazy var lastUpdatedLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .darkGray
+        label.textColor = .systemGray
         label.numberOfLines = 2
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

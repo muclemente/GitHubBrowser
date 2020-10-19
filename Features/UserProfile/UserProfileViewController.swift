@@ -27,6 +27,14 @@ class UserProfileViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    private lazy var backgroundColor: UIColor = {
+        if #available(iOS 13.0, *) {
+            return .systemBackground
+        } else {
+            return .white
+        }
+    }()
+
     private lazy var profileImage: UserProfileImageView = {
         let view = UserProfileImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -38,7 +46,6 @@ class UserProfileViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 18, weight: .thin)
         label.numberOfLines = 1
-        label.textColor = .darkText
         return label
     }()
 
@@ -47,7 +54,6 @@ class UserProfileViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 12)
         label.numberOfLines = 3
-        label.textColor = .darkText
         return label
     }()
 
@@ -73,7 +79,6 @@ class UserProfileViewController: UIViewController {
         label.isHidden = true
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 16, weight: .semibold)
-        label.textColor = .darkGray
         return label
     }()
 
@@ -89,7 +94,7 @@ class UserProfileViewController: UIViewController {
     // MARK: Internal methods
     override func loadView() {
         view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = backgroundColor
     }
 
     override func viewDidLoad() {
@@ -115,7 +120,6 @@ class UserProfileViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .darkGray
         label.text = text
         return label
     }

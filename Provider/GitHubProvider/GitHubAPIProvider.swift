@@ -13,12 +13,30 @@ import RxSwift
 
 public class GitHubAPIProvider: RequestProvider {
     private let urlProvider = DependencyManager.resolve(URLProvider.self)
+    private lazy var plist = {
+        Bundle(for: Self.self)
+            .path(forResource: "GithubAPICredentials", ofType: "plist")
+            .map { NSDictionary(contentsOfFile: $0) ?? [:] }
+    }()
 
     public init() {
+        assert(plist?["User"] != nil,
+               "Your GitHub API credentials are not set. Please update the Plist file or run `make user=x token=y project`")
     }
 
-    static let username = "muclemente"
-    static let accessToken = "926f35da3de262d8bbb0ddb47abe3a11b43f82ef"
+    private var username: String {
+        guard let value = plist?["User"] as? String else {
+            fatalError("Invalid username")
+        }
+        return value
+    }
+
+    private var accessToken: String {
+        guard let value = plist?["Token"] as? String else {
+            fatalError("Invalid token")
+        }
+        return value
+    }
 
     public func fetch(endpoint: Endpoint, args: CVarArg...) -> Observable<RequestResponse> {
         guard let url = urlProvider.url(endpoint: endpoint, with: args) else {
@@ -40,7 +58,7 @@ public class GitHubAPIProvider: RequestProvider {
     }
 
     private func authenticationHeader() -> String {
-        guard let auth = "\(GitHubAPIProvider.username):\(GitHubAPIProvider.accessToken)".data(using: String.Encoding.utf8) else {
+        guard let auth = "\(username):\(accessToken)".data(using: String.Encoding.utf8) else {
             return ""
         }
         return "Basic \(auth.base64EncodedString())"

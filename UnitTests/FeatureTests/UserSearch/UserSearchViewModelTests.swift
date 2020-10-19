@@ -88,4 +88,15 @@ class UserSearchViewModelTests: XCTestCase {
             }
         }
     }
+
+    func testCoordinatorToRepoSearch() {
+        let nav = UINavigationController()
+        let coordinator = UserSearchCoordinator(navigationController: nav)
+        coordinator.start()
+        wait(timeout: 0.4) // Wait until UIKit adds the VC in the structure
+        XCTAssertTrue(nav.topViewController is UserSearchViewController)
+        let controller = nav.topViewController as? UserSearchViewController
+        controller?.didSelect(User(id: 1, login: ""))
+        XCTAssertTrue(coordinator.childCoordinators.contains(where: {$0 is UserRepositoriesCoordinator}))
+    }
 }

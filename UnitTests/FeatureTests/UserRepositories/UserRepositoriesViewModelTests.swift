@@ -109,4 +109,29 @@ class UserRepositoriesViewModelTests: XCTestCase {
             }
         }
     }
+
+    func testCoordinatorToProfile() {
+        let nav = UINavigationController()
+        let coordinator = UserRepositoriesCoordinator(navigationController: nav, user: User(id: 1, login: ""))
+        coordinator.start()
+        wait(timeout: 0.4) // Wait until UIKit adds the VC in the structure
+        XCTAssertTrue(nav.topViewController is UserRepositoriesViewController)
+        let controller = nav.topViewController as? UserRepositoriesViewController
+        controller?.didTapProfile()
+        XCTAssertTrue(coordinator.childCoordinators.contains(where: { $0 is UserProfileCoordinator }))
+    }
+
+    func testCoordinatorBack() {
+        let nav = UINavigationController()
+        nav.pushViewController(UIViewController(), animated: false)
+        let coordinator = UserRepositoriesCoordinator(navigationController: nav, user: User(id: 1, login: ""))
+        coordinator.start()
+        wait(timeout: 0.4) // Wait until UIKit adds the VC in the structure
+        XCTAssertEqual(nav.viewControllers.count, 2)
+        XCTAssertTrue(nav.topViewController is UserRepositoriesViewController)
+        let controller = nav.topViewController as? UserRepositoriesViewController
+        controller?.didTapBack()
+        wait(timeout: 0.4)
+        XCTAssertEqual(nav.viewControllers.count, 1)
+    }
 }

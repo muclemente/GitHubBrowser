@@ -83,8 +83,12 @@ final class UserSearchViewController: ListViewController {
         tableView.rx
             .itemSelected
             .map { self.dataSource[$0] }
-            .subscribe { self.viewModel.didSelect(user: $0) }
+            .subscribe { self.didSelect($0) }
             .disposed(by: disposeBag)
+    }
+
+    func didSelect(_ user: User) {
+        viewModel.didSelect(user: user)
     }
 }
 
