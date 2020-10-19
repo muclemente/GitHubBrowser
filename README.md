@@ -24,12 +24,15 @@ I've used this project to learn a little about RxSwift and Reactive concepts;
 
 **Features:**
 - User search screen: lets you search for any GitHub user; You can search for usernames with more than 2 characters;
+
 ![Search](./Documents/search.png)
 
 - Repository list: lists all public repositories for the selected user; Also lists the watchers, forks and stars from the repo;
+
 ![Repositories](./Documents/repoList.png)
 
 - User profile: shows the public profile information from the selected user;
+
 ![Profile](./Documents/profile.png)
 
 **Things to improve:**
